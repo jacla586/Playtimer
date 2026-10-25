@@ -167,7 +167,7 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
   </section>
 
   <section class="slider-wrap">
-    <input type="range" id="slider" min="0" max="180" step="5" value="120" aria-label="Speltid i minuter">
+    <input type="range" id="slider" min="0" max="180" step="5" value="60" aria-label="Speltid i minuter">
     <div class="scale" aria-hidden="true"><span>0</span><span>1 tim</span><span>2 tim</span><span>3 tim</span></div>
   </section>
 
@@ -254,7 +254,7 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
   function showSetup() {
     document.body.classList.remove('is-done');
     slider.disabled = false; slider.step = '5';
-    slider.value = String(Math.max(5, Math.round((Number(slider.value) || 120) / 5) * 5));
+    slider.value = String(Math.max(5, Math.round((Number(slider.value) || 60) / 5) * 5));
     startBtn.hidden = false; options.hidden = false; grownup.hidden = true;
     title.textContent = 'Hur länge vill du spela?';
     note.textContent = 'Dra för att välja tid och tryck sedan på Starta.';
@@ -397,7 +397,7 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
     state = null; store.clear();
     glow.classList.remove('on');
     $('holdtext').textContent = 'Vuxen: håll in 3 sekunder för att nollställa';
-    slider.value = '120';
+    slider.value = '60';
     showSetup();
   }
 
