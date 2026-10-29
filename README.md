@@ -14,7 +14,7 @@ The demos include a 60× fast preview and a button that shows the warning glow, 
 
 ## Why this exists
 
-Ending a gaming session is one of the hardest moments of the day in many families with NPF kids. Common timers either end abruptly with a loud alarm, are easy for the child to reset, or cut power to the console like a punishment. That often makes the ending harder, especially for kids with demand avoidance or anxiety around demands.
+Ending a gaming session is one of the hardest moments of the day in many families with neurodivergent kids. Common timers either end abruptly with a loud alarm, are easy for the child to reset, or cut power to the console like a punishment. That often makes the ending harder, especially for kids with demand avoidance or anxiety around demands.
 
 I couldn't find an affordable timer built around how these kids actually work, so I made one. It is free and open source.
 
