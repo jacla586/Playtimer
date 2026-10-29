@@ -150,19 +150,8 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
 .options label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .options input { width: 1.2em; height: 1.2em; accent-color: var(--ink); }
 
-.grownup {
-  position: relative; overflow: hidden;
-  border: 1.5px solid rgba(29,43,37,0.3); border-radius: 999px;
-  background: transparent; color: var(--ink);
-  font: inherit; font-size: clamp(0.95rem, 3.6vmin, 1.25rem);
-  padding: 0.6em 1.2em; cursor: pointer;
-  touch-action: none;
-}
-.grownup .bar {
-  position: absolute; inset: 0 auto 0 0; width: 0;
-  background: rgba(29,43,37,0.16);
-}
-.grownup span { position: relative; }
+.grownup { margin: 0; color: var(--ink); opacity: 0.7; font-size: clamp(0.95rem, 3.6vmin, 1.25rem); text-wrap: balance; }
+.clock { -webkit-touch-callout: none; touch-action: none; transition: opacity 0.2s; }
 
 /* Gentle attention pulse */
 .glow {
@@ -189,7 +178,7 @@ body { margin: 0; }
 
 <main class="app">
   <section class="status" aria-live="polite">
-    <h1 id="title">How long do you want to play?</h1>
+    <h1 id="title"></h1>
     <p id="note">Slide to pick your time, then press Start.</p>
   </section>
 
@@ -209,7 +198,7 @@ body { margin: 0; }
       <label><input type="checkbox" id="chime"> Gentle sound</label>
       <label><input type="checkbox" id="cb"> Color-blind colors</label>
     </div>
-    <button class="grownup" id="grownup" type="button" hidden><span class="bar" id="holdbar"></span><span id="holdtext">Grown-up: hold 3 seconds to reset</span></button>
+    <p class="grownup" id="grownup" hidden><span id="holdtext">Grown-up: hold your finger on the time for 5 seconds to reset</span></p>
   </section>
 </main>
 
@@ -218,9 +207,10 @@ body { margin: 0; }
   const $ = id => document.getElementById(id);
   const slider = $('slider'), startBtn = $('start'), big = $('big'), sub = $('sub');
   const title = $('title'), note = $('note'), glow = $('glow');
-  const options = $('options'), grownup = $('grownup'), holdbar = $('holdbar');
+  const options = $('options'), grownup = $('grownup');
   const chimeBox = $('chime'), cbBox = $('cb');
 
+  const SHOW_HINT = false;
   const KEY = 'playtimer-v1';
   // Warnings in minutes left. The last one starts the "find a save point" phase.
   const STEPS = [
@@ -288,7 +278,7 @@ body { margin: 0; }
     slider.disabled = false; slider.step = '5';
     slider.value = String(Math.max(5, Math.round((Number(slider.value) || 60) / 5) * 5));
     startBtn.hidden = false; options.hidden = false; grownup.hidden = true;
-    title.textContent = 'How long do you want to play?';
+    title.textContent = '';
     note.textContent = 'Slide to pick your time, then press Start.';
     sub.innerHTML = '&nbsp;';
     applyDone();
@@ -318,7 +308,7 @@ body { margin: 0; }
   }
 
   function run(resumed) {
-    startBtn.hidden = true; options.hidden = true; grownup.hidden = false;
+    startBtn.hidden = true; options.hidden = true; grownup.hidden = !SHOW_HINT;
     slider.disabled = true; slider.step = 'any';
     // On resume, warnings already passed are marked done without pulsing.
     if (resumed) {
@@ -327,7 +317,7 @@ body { margin: 0; }
     }
     const current = [...STEPS].reverse().find(s => state.fired.includes(s.at));
     if (current) { title.textContent = current.title; note.textContent = current.note; }
-    else { title.textContent = 'Have fun!'; note.textContent = 'Lots of time. The color will change slowly as time goes by.'; }
+    else { title.textContent = ''; note.textContent = ''; }
     requestWake();
     clearInterval(tick);
     tick = setInterval(update, 250);
@@ -368,8 +358,8 @@ body { margin: 0; }
     sub.innerHTML = '&nbsp;';
     title.textContent = 'Playtime is over for now';
     note.textContent = 'Your game time is finished. Time for the next thing.';
-    grownup.hidden = false;
-    $('holdtext').textContent = 'Grown-up: hold 3 seconds for a new timer';
+    grownup.hidden = !SHOW_HINT;
+    $('holdtext').textContent = 'Grown-up: hold your finger on the time for 5 seconds for a new timer';
     if (state && state.chime) chime([523.25, 392.0]);
     if (state) { state.finished = true; store.set(state); }
   }
@@ -411,25 +401,31 @@ body { margin: 0; }
   });
 
   // ---------- grown-up hold to reset ----------
-  let holdStart = 0, holdRaf = 0;
-  const HOLD = 3000;
+  // Hidden: hold a finger on the time for 5 seconds. After 2 s the numbers start to fade.
+  let holdStart = 0, holdRaf = 0, holding = false;
+  const HOLD = 5000, QUIET = 2000;
+  const clock = big.parentElement;
   function holdFrame() {
-    const p = Math.min(1, (Date.now() - holdStart) / HOLD);
-    holdbar.style.width = (p * 100) + '%';
-    if (p >= 1) { endHold(); reset(); return; }
+    const t = Date.now() - holdStart;
+    if (t > QUIET) clock.style.opacity = String(1 - 0.75 * Math.min(1, (t - QUIET) / (HOLD - QUIET)));
+    if (t >= HOLD) { endHold(); reset(); return; }
     holdRaf = requestAnimationFrame(holdFrame);
   }
-  function startHold(e) { e.preventDefault(); holdStart = Date.now(); cancelAnimationFrame(holdRaf); holdRaf = requestAnimationFrame(holdFrame); }
-  function endHold() { cancelAnimationFrame(holdRaf); holdbar.style.width = '0'; }
-  grownup.addEventListener('pointerdown', startHold);
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => grownup.addEventListener(ev, endHold));
-  grownup.addEventListener('contextmenu', e => e.preventDefault());
+  function startHold(e) {
+    if (!state) return;
+    e.preventDefault(); holding = true; holdStart = Date.now();
+    cancelAnimationFrame(holdRaf); holdRaf = requestAnimationFrame(holdFrame);
+  }
+  function endHold() { if (!holding) return; holding = false; cancelAnimationFrame(holdRaf); clock.style.opacity = ''; }
+  clock.addEventListener('pointerdown', startHold);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => clock.addEventListener(ev, endHold));
+  clock.addEventListener('contextmenu', e => e.preventDefault());
 
   function reset() {
     clearInterval(tick); tick = null; releaseWake();
     state = null; store.clear();
     glow.classList.remove('on');
-    $('holdtext').textContent = 'Grown-up: hold 3 seconds to reset';
+    $('holdtext').textContent = 'Grown-up: hold your finger on the time for 5 seconds to reset';
     slider.value = '60';
     showSetup();
   }
