@@ -2,7 +2,11 @@
 
 A calm, visual gaming timer for neurodivergent kids (ADHD, autism and related conditions), built by a parent for parents.
 
-**[Open Speltimer](https://YOURNAME.github.io/speltimer/)** (Swedish) · **[Try the demo](https://YOURNAME.github.io/speltimer/demo.html)** (English, with a fast preview mode)
+**[Öppna Speltimer](https://jacla586.github.io/Playtimer/)** (svenska) · [Demo](https://jacla586.github.io/Playtimer/demo.html)
+
+**[Open Playtimer](https://jacla586.github.io/Playtimer/en/)** (English) · [Demo](https://jacla586.github.io/Playtimer/en/demo.html)
+
+The demos include a 60× fast preview and a button that shows the warning glow, so grown-ups can see the whole sequence in a couple of minutes.
 
 > **På svenska:** Speltimer är en lugn, visuell timer för barn med NPF som har svårt att avsluta spelande. Barnet väljer själv tiden, skärmen byter färg i tydliga zoner och ger mjuka förvarningar vid 30, 10 och 5 minuter kvar. Inga larm, inget rött, ingen stoppknapp för barnet. Gratis och öppen källkod, fungerar i mobilen och sparar ingen data någonstans utom i din egen webbläsare.
 
@@ -40,7 +44,7 @@ These are the ideas behind the timer. They're based on common advice for kids wi
 - **Early, predictable warnings.** Sudden endings are hard for many autistic kids. Warnings at 30, 10 and 5 minutes give time to prepare.
 - **A "find a save point" phase.** Being cut off mid-level feels deeply unfair. The last five minutes are for finding a good place to stop, which gives the child some control over exactly when.
 - **No red, no alarms, no flashing.** Red reads as danger or punishment. The warnings glow slowly instead of flashing, to avoid startling sensory-sensitive kids.
-- **No stop button for the child.** Once started, the timer can't be changed or restarted by the child. A grown-up can reset it by holding a button for 3 seconds.
+- **No stop button for the child.** Once started, the timer can't be changed or restarted by the child. A grown-up can reset it with a hidden gesture, which the demo version explains.
 
 ## Features
 
@@ -67,8 +71,10 @@ The whole app is a single HTML file. Download `index.html` and put it on any web
 
 | File | What it is |
 |---|---|
-| `index.html` | Release version, Swedish |
-| `demo.html` | English demo with a 60× fast preview and a button to show the warning glow |
+| `index.html` | Swedish release |
+| `demo.html` | Swedish demo (60× fast preview, button to show the warning glow) |
+| `en/index.html` | English release |
+| `en/demo.html` | English demo |
 
 ## Roadmap
 
